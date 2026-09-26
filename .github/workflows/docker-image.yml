@@ -29,7 +29,10 @@ jobs:
           distribution: 'temurin'
 
       - name: Run tests
-        run: ./mvnw test
+        run: bash ./demoDocker/mvnw -f ./demoDocker/pom.xml test
+
+      - name: Package application
+        run: bash ./demoDocker/mvnw -f ./demoDocker/pom.xml -DskipTests package
 
       - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
@@ -54,7 +57,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./demoDocker
+          file: ./demoDocker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
